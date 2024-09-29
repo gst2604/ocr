@@ -46,14 +46,19 @@ if uploaded_file is not None:
     st.subheader("Extracted Text:")
     st.write(extracted_text)
 
-    # Try to translate the extracted text to Hindi using deep-translator
+    # Detect the language and translate accordingly
     try:
-        translated_text = GoogleTranslator(source='en', target='hi').translate(extracted_text)
-    except Exception as e:
-        translated_text = "Translation failed due to: " + str(e)
+        # Assuming texts that contain any Devanagari characters are Hindi, otherwise English
+        if any('\u0900' <= char <= '\u097F' for char in extracted_text):
+            translated_text = GoogleTranslator(source='hi', target='en').translate(extracted_text)
+            st.subheader("Translated Text (English):")
+        else:
+            translated_text = GoogleTranslator(source='en', target='hi').translate(extracted_text)
+            st.subheader("Translated Text (Hindi):")
 
-    st.subheader("Translated Text (Hindi):")
-    st.write(translated_text)
+        st.write(translated_text)
+    except Exception as e:
+        st.write(f"Translation failed: {str(e)}")
 
     # Display the images
     st.image(Image.open(image_path), caption='Uploaded Image', use_column_width=True)
